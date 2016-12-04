@@ -45,3 +45,6 @@ python fss_module_test.py 43 10 DATA_SET_DIRECTORY
   2. Use argparser. Check example here https://www.cyberciti.biz/faq/python-command-line-arguments-argv-example/
   3. Use default for monitored list and bitmap counter if not passed as part of command line parameters
 
+##Notes
+    1. I am not python expert. Code may not be optimized. I am listening please feel free to suggest any optimization that you may find.
+    2. Code is not extensively tested hence it can have bugs and i will be more than happy to fix all of them. Please feel free to report any bugs that you may found in the code
