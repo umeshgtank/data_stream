@@ -146,6 +146,14 @@ class fss:
             topn.append(element.value)
         return topn
 
+    def getTopNWithFrequency(self):
+        # prints and returns top-n values
+        topn = {}
+        for element in self.monitoredList:
+            print "value=", element.value, "frequency=", element.frequency, "error=", element.error
+            topn[element.value] = element.frequency
+        return topn
+
 
 if __name__ == '__main__':
     no_of_args = len(sys.argv)
@@ -168,7 +176,7 @@ if __name__ == '__main__':
                 break
 
         print "No of files processed= ", count
-        top = _fss.getTopN()
+        top = _fss.getTopNWithFrequency()
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S:%f')
         print "Done with counting top values..", st, "\treturned top =", top
