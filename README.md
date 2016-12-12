@@ -11,8 +11,8 @@ Implementation of various data stream algorithms in different (but relevant) pro
 ##Pending items
 1. Initially i thought of implementing classes as template but I couldn’t think of any use case. I am still in dilemma if template implementation makes sense?
 2. ~~Including Makefile for easy compilation.~~
-3. Code cleanup. 
-4. All the data member of bitmapCounter & fssElement are public and that needs to be fixed. They must be private
+3. ~~Code cleanup.~~ 
+4. ~~All the data member of bitmapCounter & fssElement are public and that needs to be fixed. They must be private~~
 
 
 ##Compiling the source.
