@@ -39,34 +39,11 @@
 //          Just update counter's alpha by 1
 //
 
-fssElement::fssElement(std::string &val,
-                                 long freq,
-                                 long err,
-                                 bitmapCounter &ctr):   value(val),
-                                                        frequency(freq),
-                                                        error(err),
-                                                        counter(ctr){}
-
-
 //Constructure initialize member variables
-//TODO: Need designated initializers
-//template <typename dataType>
-fss::fss(){
-    bitmap.assign(bitmapCounterCells_h, bitmapCounter());
-    isMonitoredListFull = false;
-    //TODO: in my opinion initializing with empty object should be fine as well
-    //because we can always check frequency and replace the element. This will
-    //make sure that we will have a common implementation.
-    monitoredList.assign(noOfMonitoredElement_m, fssElement());
-}
-
 fss::fss(long bitmapCell, long monitoredElement)
 :bitmapCounterCells_h(bitmapCell), noOfMonitoredElement_m(monitoredElement){
     bitmap.assign(bitmapCounterCells_h, bitmapCounter());
     isMonitoredListFull = false;
-    //TODO: in my opinion initializing with empty object should be fine as well
-    //because we can always check frequency and replace the element. This will
-    //make sure that we will have a common implementation.
     monitoredList.assign(noOfMonitoredElement_m, fssElement());
 }
 
@@ -74,78 +51,76 @@ fss::fss(long bitmapCell, long monitoredElement)
 void fss::appendToList(std::string &data){
     std::size_t hData = std::hash<std::string>{}(data);
     //Even this works!
-//    std::hash<std::string> hs;
-//    std::size_t hData = hs(data);
+    //    std::hash<std::string> hs;
+    //    std::size_t hData = hs(data);
     
     //std::cout<<"calculated hash= "<< hData <<" \tfor the data = "<<data <<" possible cell index = "<<hData % bitmapCounterCells_h<<"\n";
     long bitmapCellIndex = hData % bitmapCounterCells_h;
-    //if (bitmap[bitmapCellIndex]){
-        if (bitmap[bitmapCellIndex].isMonitored){
-            //exist in monitored list
-            std::vector<fssElement>::iterator it;
+    if (bitmap[bitmapCellIndex].isMonitored){
+        //exist in monitored list
+        std::vector<fssElement>::iterator it;
+        for (it = monitoredList.begin() ; it != monitoredList.end(); ++it){
+            //std::cout << ' ' <<(*it).frequency<<(*it).error<<(*it).frequency<<(*it).value<<"\n";
+            if ((*it).value == data){
+                //Found the element. Now let's update the frequency by 1
+                (*it).frequency++;
+                
+                //Do we need a function to sort the element something like ?
+                std::sort(monitoredList.begin(), monitoredList.end(), monitoredListComparator());
+                //printTopN();
+                break;
+            }
+        }
+    } else {
+        //Not monitored. Either need to add or replace the existing one
+        //let's check if list is full
+        bool isMonitoredListUpdate = false;
+        if (!isMonitoredListFull){
+            typename std::vector<fssElement >::iterator it;
             for (it = monitoredList.begin() ; it != monitoredList.end(); ++it){
-                //std::cout << ' ' <<(*it).frequency<<(*it).error<<(*it).frequency<<(*it).value<<"\n";
-                if ((*it).value == data){
-                    //Found the element. Now let's update the frequency by 1
-                    (*it).frequency++;
-                    
-                    //Do we need a function to sort the element something like ?
-                    //sortMonitoredList();
-                    std::sort(monitoredList.begin(), monitoredList.end(), monitoredListComparator());
-                    //printTopN();
+                if((*it).isEmpty){
+                    //prepare an element and set it to this iterator
+                    (*it).value = data;
+                    (*it).frequency = bitmap[bitmapCellIndex].alpha_error+1;
+                    (*it).error = bitmap[bitmapCellIndex].alpha_error;
+                    (*it).counter = bitmap[bitmapCellIndex];
+                    (*it).isEmpty = false;
+                    (*it).counter_index = bitmapCellIndex;
+                    bitmap[bitmapCellIndex].isMonitored = true;
+                    isMonitoredListUpdate = true;
                     break;
                 }
             }
-        } else {
-            //Not monitored. Either need to add or replace the existing one
-            //let's check if list is full
-            bool isMonitoredListUpdate = false;
-            if (!isMonitoredListFull){
-                typename std::vector<fssElement >::iterator it;
-                for (it = monitoredList.begin() ; it != monitoredList.end(); ++it){
-                    if((*it).isEmpty){
-                        //prepare an element and set it to this iterator
-                        (*it).value = data;
-                        (*it).frequency = bitmap[bitmapCellIndex].alpha_error+1;
-                        (*it).error = bitmap[bitmapCellIndex].alpha_error;
-                        (*it).counter = bitmap[bitmapCellIndex];
-                        (*it).isEmpty = false;
-                        (*it).counter_index = bitmapCellIndex;
-                        bitmap[bitmapCellIndex].isMonitored = true;
-                        isMonitoredListUpdate = true;
-                        break;
-                    }
-                }
-                if (!isMonitoredListUpdate){
-                    isMonitoredListFull = true;
-                }
-            } else {
-                //let's replace the last element.
-                //Note that we need to updat the existing element's counter
-                if (bitmap[bitmapCellIndex].alpha_error+1 > monitoredList[noOfMonitoredElement_m-1].frequency){
-                    long monitoredListCounterIndex = monitoredList[noOfMonitoredElement_m-1].counter_index;
-                    bitmap[monitoredListCounterIndex].isMonitored = false;
-                    bitmap[monitoredListCounterIndex].alpha_error = monitoredList[noOfMonitoredElement_m-1].frequency + 1;
-                    
-                    monitoredList[noOfMonitoredElement_m-1].value = data;
-                    monitoredList[noOfMonitoredElement_m-1].frequency = bitmap[bitmapCellIndex].alpha_error+1;
-                    monitoredList[noOfMonitoredElement_m-1].error = bitmap[bitmapCellIndex].alpha_error;
-                    monitoredList[noOfMonitoredElement_m-1].counter = bitmap[bitmapCellIndex]; //This needs a pointer assignment
-                    monitoredList[noOfMonitoredElement_m-1].counter_index = bitmapCellIndex;
-                    bitmap[bitmapCellIndex].isMonitored = true;
-                    
-                    isMonitoredListUpdate = true;
-                } else {
-                    //Update coutner's alpha_error
-                    bitmap[bitmapCellIndex].alpha_error++;
-                }
+            if (!isMonitoredListUpdate){
+                isMonitoredListFull = true;
             }
-            
-            if (isMonitoredListUpdate){
-                std::sort(monitoredList.begin(), monitoredList.end(), monitoredListComparator());
-                //printTopN();
+        } else {
+            //let's replace the last element.
+            //Note that we need to updat the existing element's counter
+            if (bitmap[bitmapCellIndex].alpha_error+1 > monitoredList[noOfMonitoredElement_m-1].frequency){
+                long monitoredListCounterIndex = monitoredList[noOfMonitoredElement_m-1].counter_index;
+                bitmap[monitoredListCounterIndex].isMonitored = false;
+                bitmap[monitoredListCounterIndex].alpha_error = monitoredList[noOfMonitoredElement_m-1].frequency + 1;
+                
+                monitoredList[noOfMonitoredElement_m-1].value = data;
+                monitoredList[noOfMonitoredElement_m-1].frequency = bitmap[bitmapCellIndex].alpha_error+1;
+                monitoredList[noOfMonitoredElement_m-1].error = bitmap[bitmapCellIndex].alpha_error;
+                monitoredList[noOfMonitoredElement_m-1].counter = bitmap[bitmapCellIndex]; //This needs a pointer assignment
+                monitoredList[noOfMonitoredElement_m-1].counter_index = bitmapCellIndex;
+                bitmap[bitmapCellIndex].isMonitored = true;
+                
+                isMonitoredListUpdate = true;
+            } else {
+                //Update coutner's alpha_error
+                bitmap[bitmapCellIndex].alpha_error++;
             }
         }
+        
+        if (isMonitoredListUpdate){
+            std::sort(monitoredList.begin(), monitoredList.end(), monitoredListComparator());
+            //printTopN();
+        }
+    }
 }
 
 void fss::printTopN(){
@@ -156,6 +131,7 @@ void fss::printTopN(){
         std::cout<<(*it).value<<"\t\t"<<(*it).frequency<<"\t\t"<<(*it).error<<"\t\t"<<(*it).counter.alpha_error<< "\n";
     }
 }
+
 //template <typename dataType>
 //void fss<dataType>::sortMonitoredList(){
 //    //Sort the list.

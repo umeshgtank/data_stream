@@ -19,46 +19,23 @@
 //http://www.l2f.inesc-id.pt/~fmmb/wiki/uploads/Work/misnis.ref0a.pdf
 
 
-class bitmapCounter{
-    
-public:
-    //default constructor
-    bitmapCounter(){
-        alpha_error = 0;
-        isMonitored = false;
-    }
-    
-//TODO: below section must be private. Expose getter / setter
-public:
+struct bitmapCounter{
     //Represents error
     long    alpha_error;
-    //Represents number of monitored elements in particular cell.
-    //eg., for i, this will be number of elements in cell c(i).
-    //long    noOfElementsInCell;
     
     //Represents if an element is monitored by the monitored list
     bool    isMonitored;
 };
 
-//template <typename elementType = std::string>
-class fssElement{
-public:
-    //Constructors
-    fssElement(){ isEmpty = true;};
-    fssElement(std::string &val, long freq, long err, bitmapCounter &ctr);
+
+struct fssElement{
+    std::string     value;              //store value of element
+    long            frequency;          //frequency of the element. Estimate count
+    long            error;              //errors in count
+    bitmapCounter   counter;            //reference to counter from the bitmap
+    bool            isEmpty;            //Check if this is an empty element
+    long            counter_index;      //To store index of the counter for easy retrival
     
-//TODO: below section must be private. Expose getter / setter
-public:
-    std::string                     value;              //store value of element
-    long                            frequency;          //frequency of the element. Estimate count
-    long                            error;              //errors in count
-    bitmapCounter                   counter;            //reference to counter from the bitmap
-    bool                            isEmpty;            //Check if this is an empty element
-    long                            counter_index;       //To store index of the counter for easy retrival
-    
-    //TODO: does it makes sense to have shared pointer instead?
-    //sharing is a challenge, i need to check this...
-    //std::shared_ptr<bitmapCounter>  sptr_Counter;       //reference to counter from the bitmap
 };
 
 //Need sorting algo to sort monitored element
@@ -66,28 +43,7 @@ public:
 class fss{
 public:
     //Constructors
-    fss();
     fss(long bitmapCell, long monitoredElement);
-    
-    //Expecting input in csv (comma separated value) format.
-    //This can be optimized using template and make sure that
-    //we get data feed from formatters.
-    
-    fss(std::string &stream){
-        //move this implementation in separate method
-    }
-    
-    
-    //This must be handled outside of fss.
-    //Commenting it out for now
-//    void appendFromCSV(std::string &stream){
-//        char *token;
-//        token = strtok(const_cast<char*>(stream.c_str()) , "'");
-//        while (token){
-//            appendToList(token);
-//            token = strtok(NULL , "'");
-//        }
-//    }
     
     //Copy constructor
     fss(const fss&);
@@ -97,13 +53,9 @@ public:
     
     //Use following medthod to insert an element in fss
     void appendToList(std::string &data);
-
+    
     //Get top N from the list
     void printTopN();
-    
-    //Sort moniotred list
-    //void sortMonitoredList();
-    
     
 private:
     //h - hash function for number of cells
@@ -126,13 +78,13 @@ private:
     
 };
 
-//Implementing a dummy class for input. This will be an input format and
-//fss can just call getStream to get the data in key-value pair.
-template <typename Type = std::string>
-class streamFormat{
-private:
-    Type formatter;
-};
+////Implementing a dummy class for input. This will be an input format and
+////fss can just call getStream to get the data in key-value pair.
+//template <typename Type = std::string>
+//class streamFormat{
+//private:
+//    Type formatter;
+//};
 
 
 //Writing a functor to sort monitored list
