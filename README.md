@@ -7,7 +7,13 @@ Currently following algorithms are implemented.
     1. C++
     2. Python
 
-
+2. Space saving
+    1. C++
+    2. Pyton
+    
+3. Heavy hitter / stream trend
+    1.  C++
+    2. Python
 
 
 

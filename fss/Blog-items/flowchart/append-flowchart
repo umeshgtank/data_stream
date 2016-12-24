@@ -1,0 +1,64 @@
+@startuml
+title: FSS impelemntation
+/'floating note right: Algorithm implementation needs following inputs
+1. Number of bitmap counter cells
+2. Number of top items. n in top-n'/
+
+note right
+    Algorithm implementation needs following inputs
+    1. Number of bitmap counter cells
+    2. Number of top items. n in top-n
+end note
+
+(*)--> "Assume we have following.
+1. Monitored list called monitoredList.
+2. Bitmap counter called bitmapCounter" as defines
+note right
+    Streaming data will be an input to this algorithm.
+    bitmap counter has following attributes
+        1. alphaError: Represents error count
+        2. isMonitored: A boolean flag indicating if already monitored in the list
+
+    And Monitored list has following attributes
+        1. value: Actual value of input data
+        2. frequency: Frequency of this element
+        3. error: Error count of this element
+        4. counter: Reference to corresponding bitmap counter
+        5. counter_index: Index of the bitmap counter.
+        6. isEmpty: Indicates if this element is empty
+end note
+--> "hData = hash(inputData)"
+--> "get the index in bitmap counter
+    bIndex = hData % number of bitmap cells available"
+if "isMonitored" then
+    --> [true] "1. find an element 'e' in monitoredList
+    where value = inputData
+    2. e.frequency++
+    3. sort monitoredList"
+    --> (*)
+else
+    if "isMonitoredListFull" then
+        --> [No] "1. Add an element to monitoredList
+        2. sort monitoredList"
+        --> (*)
+    else
+        --> [Yes] "Check if new element can be added"
+        if "bitmapCounter[bIndex].alphaError +1 > monitoredList[lastIndex].frequency" then
+            -right-> [Yes] "1. idx= monitoredList[lastIndex].counter_index
+            2. set bitmapCounter[idx].ismonitored = false
+            & bitmapCounter[idx].alphaError = monitoredList[lastIndex].error
+            3. monitoredList[lastIndex].value = inputData
+            monitoredList[lastIndex].frequency = bitmapCounter[bIndex].alpha_error,
+            monitoredList[lastIndex].counter_index = index
+            monitoredList[lastIndex].counter = bitmapCounter[bIndex]
+            bitmapCounter[bIndex].isMonitored = true
+            4. sort monitoredList"
+            --> (*)
+        else
+            -->[No] "bitmapCounter[bIndex].alphaError++"
+            --> (*)
+        endif
+    endif
+endif
+-->"continue with next data item"
+@enduml
