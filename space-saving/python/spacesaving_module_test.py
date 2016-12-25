@@ -2,7 +2,7 @@ from spacesaving import *
 
 if __name__ == '__main__':
     no_of_args = len(sys.argv)
-    if no_of_args == 3:
+    if no_of_args == 2:
         args = str(sys.argv)
         # Example mostTrending = streamTrend(33);
         ss = spaceSaving(int(sys.argv[1]));
