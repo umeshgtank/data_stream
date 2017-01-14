@@ -59,16 +59,18 @@ void StreamTrend::updateItemHit(std::string &data){
             //with 0 count
            typename std::vector<element>::iterator it;
            for (it = m_counters.begin() ; it != m_counters.end(); ++it ){
-               if(!(*it).isFull){
-                   //prepare an element and set it to this iterator
-                   (*it).value = data;
+               //Safety check. Note that below condition is not required
+               // if ((*it).isFull)
+               //Reason is m_isMonitoredListFull is set to false and it will
+               //take care of the count being positive. But still keeping it
+               //for safety.
+               if ((*it).isFull){
                    (*it).count --;
+               }
                    if ((*it).count == 0){
                        (*it).isFull = false;
                        m_isMonitoredListFull = false;
                    }
-                   break;
-               }
            }
         }
     }
