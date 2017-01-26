@@ -15,6 +15,7 @@ Currently following algorithms are implemented.
     1.  C++
     2. Python
 
-
+4. HLL (Hyperloglog)
+	1. C++
 
 
