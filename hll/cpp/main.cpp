@@ -36,7 +36,7 @@ int main(int argc, const char * argv[]) {
     std::cout<<"Size of data point range is = "<<dataPointRangeLength<<"\n";
     for (int index = 0; index<dataPointRangeLength; index++){
         hll _hll = hll(10);
-        hll64 _hll64 = hll64(10);
+        hll64 _hll64 = hll64(20);
         std::string sampleStr("hyperloglog_");
         std::cout<<"\n\n################################## \nActual cardinality = "<<dataPointRange[index]<<"\n";
         for(int i = 0; i < dataPointRange[index]; i++) {
